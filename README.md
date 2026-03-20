@@ -1,4 +1,38 @@
-# .NETify - Fullstack Spotify Clone
+# How to start app 
+## First Backend
+- Init
+```Powershell
+cd backend
+dotnet restore
+dotnet run
+```
+- If data migration was not done, before init do:
+```shell
+dotnet ef migrations remove 
+dotnet ef migrations add InitDB
+dotnet ef database update
+```
+## Next Frontend
+- First startup:
+```shell
+cd frontend
+echo "NEXT_PUBLIC_API_URL=http://localhost:5020" >> .env.local
+echo "TOKEN_COOKIE_NAME=.AspNetCore.Identity.Application" >> .env.local
+echo "NODE_TLS_REJECT_UNAUTHORIZED=0" >> .env.local
+pnpm install
+pnpm dev
+```
+- Default Startup:
+```shell
+cd frontend
+$env:NEXT_PUBLIC_API_URL="http://localhost:5020"
+$env:TOKEN_COOKIE_NAME=".AspNetCore.Identity.Application"
+$env:NODE_TLS_REJECT_UNAUTHORIZED="0"
+pnpm install
+pnpm dev
+```
+
+## .NETify - Fullstack Spotify Clone By NacomiTagiera fixes by NeedyUNSU
 
 A modern, fullstack music streaming application built with .NET 8 and Next.js 15, featuring a comprehensive music library, playlist management, and real-time audio playback.
 

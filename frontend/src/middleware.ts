@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 
-	const token = request.cookies.get(process.env.TOKEN_COOKIE_NAME as string)?.value;
+	const token = request.cookies.get('.AspNetCore.Identity.Application')?.value;
 
 	if (!token) {
 		const loginUrl = new URL('/login', request.url);

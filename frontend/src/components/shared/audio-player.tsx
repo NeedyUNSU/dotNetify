@@ -12,7 +12,7 @@ export const AudioPlayer = () => {
 
 	useEffect(() => {
 		if (isPlaying) {
-			void audioRef.current?.play();
+			void audioRef.current?.play().catch(() => {});
 		} else {
 			audioRef.current?.pause();
 		}
@@ -36,14 +36,14 @@ export const AudioPlayer = () => {
 		const audio = audioRef.current;
 
 		const isSongChange = prevSongRef.current !== currentSong?.songUrl;
-		if (isSongChange) {
-			audio.src = currentSong?.songUrl;
+		if (isSongChange && currentSong?.songUrl) {
+			audio.src = currentSong.songUrl;
 			audio.currentTime = 0;
 
 			prevSongRef.current = currentSong?.songUrl;
 
 			if (isPlaying) {
-				void audio.play();
+				audio.play().catch(() => {});
 			}
 		}
 	}, [currentSong, isPlaying]);

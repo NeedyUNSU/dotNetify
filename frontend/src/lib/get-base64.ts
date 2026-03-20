@@ -2,6 +2,8 @@ import fs from 'node:fs/promises';
 import { getPlaiceholder } from 'plaiceholder';
 
 export const getBase64 = async (path: string) => {
+	if (!path) return '';
+
 	let buffer: Buffer;
 
 	if (path.startsWith('https://')) {

@@ -32,27 +32,32 @@ export const getLikedArtists = async () => {
 
 export const getArtistById = async (id: number) => {
 	const response = await fetch(`${API_URL}/api/SongArtist/artist/${id}`);
-	const data = (await response.json()) as SongArtistResponse[];
+	if (!response.ok) return null;
+	const text = await response.text();
+	try {
+		const data = JSON.parse(text) as SongArtistResponse[];
+		if (!data.length || !data[0]?.artist) return null;
 
-	if (!data.length || !data[0]?.artist) return null;
+		const { artist, artistId } = data[0];
 
-	const { artist, artistId } = data[0];
-
-	return {
-		id: artistId,
-		nickname: artist.nickname,
-		imageUrl: artist.imageUrl ?? '',
-		songs: data.map(({ song }) => ({
-			id: song.id,
-			title: song.title,
-			genreId: song.genreId,
-			songLength: song.songLength,
-			releaseYear: song.releaseYear,
-			viewCount: song.viewCount,
-			coverUrl: song.coverUrl,
-			songUrl: song.songUrl,
-		})),
-	} satisfies Artist;
+		return {
+			id: artistId,
+			nickname: artist.nickname,
+			imageUrl: artist.imageUrl ?? '',
+			songs: data.map(({ song }) => ({
+				id: song.id,
+				title: song.title,
+				genreId: song.genreId,
+				songLength: song.songLength,
+				releaseYear: song.releaseYear,
+				viewCount: song.viewCount,
+				coverUrl: song.coverUrl,
+				songUrl: song.songUrl,
+			})),
+		} satisfies Artist;
+	} catch {
+		return null;
+	}
 };
 
 export const likeArtist = async (artistId: number) => {
@@ -75,8 +80,17 @@ export const likeArtist = async (artistId: number) => {
 	return response;
 };
 
-export const removeLikedArtist = async (id: number) => {
-	const res = await fetch(`${API_URL}/api/LikedArtists/${id}`, {
+export const removeLikedArtist = async (artistId: number) => {
+	const user = await getCurrentUser();
+	if (!user) return;
+
+	const response = await fetch(`${API_URL}/api/LikedArtists/user/${user.id}`);
+	const likedArtists = (await response.json()) as LikedArtistResponse[];
+	const likedArtist = likedArtists.find((la) => la.artistId === artistId);
+
+	if (!likedArtist) return;
+
+	const res = await fetch(`${API_URL}/api/LikedArtists/${likedArtist.id}`, {
 		method: 'DELETE',
 		credentials: 'include',
 	});

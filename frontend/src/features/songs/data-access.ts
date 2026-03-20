@@ -77,14 +77,24 @@ export const addSongToHistory = async (songId: number) => {
 };
 
 export const editSong = async (song: Song) => {
-	const response = await fetch(`${API_URL}/api/Songs`, {
+	const response = await fetch(`${API_URL}/api/Songs/${song.id}`, {
 		method: 'PUT',
 		credentials: 'include',
 		headers: {
 			accept: 'application/json',
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(song),
+		body: JSON.stringify({
+			id: song.id,
+			title: song.title,
+			genreId: song.genreId,
+			songLength: song.songLength,
+			releaseYear: song.releaseYear,
+			viewCount: song.viewCount,
+			coverUrl: song.coverUrl,
+			songUrl: song.songUrl,
+			artist: song.artist ?? { id: 0, nickname: '', imageUrl: '' },
+		}),
 	});
 
 	if (!response.ok) {
@@ -115,7 +125,16 @@ export const likeSong = async (songId: number) => {
 };
 
 export const removeLikedSong = async (songId: number) => {
-	const res = await fetch(`${API_URL}/api/LikedSongs/${songId}`, {
+	const user = await getCurrentUser();
+	if (!user) return;
+
+	const response = await fetch(`${API_URL}/api/LikedSongs/user/${user.id}`);
+	const likedSongs = (await response.json()) as LikedSongResponse[];
+	const likedSong = likedSongs.find((ls) => ls.songDto.id === songId);
+
+	if (!likedSong) return;
+
+	const res = await fetch(`${API_URL}/api/LikedSongs/${likedSong.id}`, {
 		method: 'DELETE',
 		credentials: 'include',
 	});
@@ -200,9 +219,10 @@ export const getUserHistory = async () => {
 };
 
 export const createSong = async (song: CreateSong) => {
-	const artist = await getArtistById(song.artistId);
+	const response = await fetch(`${API_URL}/api/Artist/${song.artistId}`);
+	const artist = response.ok ? await response.json() : null;
 
-	const response = await fetch(`${API_URL}/api/Songs`, {
+	const res = await fetch(`${API_URL}/api/Songs`, {
 		method: 'POST',
 		credentials: 'include',
 		headers: {
@@ -218,14 +238,30 @@ export const createSong = async (song: CreateSong) => {
 			genreId: song.genreId,
 			viewCount: 0,
 			artist: {
-				id: artist?.id,
-				nickname: artist?.nickname,
-				imageUrl: artist?.imageUrl,
+				id: artist?.id ?? 0,
+				nickname: artist?.nickname ?? '',
+				imageUrl: artist?.imageUrl ?? '',
 			},
 		}),
 	});
 
-	return response;
+	if (res.ok) {
+		const createdSong = await res.json();
+		await fetch(`${API_URL}/api/SongArtist`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: {
+				accept: 'application/json',
+				'Content-type': 'application/json',
+			},
+			body: JSON.stringify({
+				songId: createdSong.id,
+				artistId: song.artistId,
+			}),
+		});
+	}
+
+	return res;
 };
 
 export const deleteSong = async (id: number) => {

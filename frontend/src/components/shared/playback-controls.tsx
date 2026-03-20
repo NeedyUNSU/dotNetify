@@ -67,7 +67,7 @@ export const PlaybackControls = () => {
 					{currentSong && (
 						<>
 							<Image
-								src={currentSong.coverUrl}
+								src={currentSong.coverUrl || '/album.jpg'}
 								alt={currentSong.title}
 								width={56}
 								height={56}

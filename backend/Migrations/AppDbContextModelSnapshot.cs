@@ -312,13 +312,9 @@ namespace dotNETify.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CoverUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("GenreId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("PlaylistId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ReleaseYear")
@@ -328,7 +324,6 @@ namespace dotNETify.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("SongUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Title")
@@ -342,8 +337,6 @@ namespace dotNETify.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GenreId");
-
-                    b.HasIndex("PlaylistId");
 
                     b.ToTable("Songs");
                 });
@@ -439,6 +432,9 @@ namespace dotNETify.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -616,10 +612,6 @@ namespace dotNETify.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("dotNETify.Models.Playlist", null)
-                        .WithMany("SongList")
-                        .HasForeignKey("PlaylistId");
-
                     b.Navigation("Genre");
                 });
 
@@ -678,11 +670,6 @@ namespace dotNETify.Migrations
                     b.Navigation("Song");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("dotNETify.Models.Playlist", b =>
-                {
-                    b.Navigation("SongList");
                 });
 
             modelBuilder.Entity("dotNETify.Models.User", b =>

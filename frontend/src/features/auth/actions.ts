@@ -10,6 +10,7 @@ import { signIn, signUp } from './data-access';
 import { authSchema } from './schema';
 
 export const signInAction = async (email: string, password: string): Promise<FormState> => {
+	console.log('API_URL:', API_URL);
 	try {
 		const result = authSchema.safeParse({ email, password });
 
@@ -42,7 +43,7 @@ export const signInAction = async (email: string, password: string): Promise<For
 		if (setCookie) {
 			const cookieValue = setCookie.split(';')[0]?.split('=')[1];
 			if (cookieValue) {
-				cookieStore.set(process.env.TOKEN_COOKIE_NAME!, cookieValue, {
+				cookieStore.set('.AspNetCore.Identity.Application', cookieValue, {
 					httpOnly: true,
 					secure: true,
 					sameSite: 'lax',
@@ -88,6 +89,6 @@ export const signUpAction = async (email: string, password: string): Promise<For
 };
 
 export const logout = async () => {
-	(await cookies()).delete(process.env.TOKEN_COOKIE_NAME!);
+	(await cookies()).delete('.AspNetCore.Identity.Application');
 	redirect('/login');
 };

@@ -16,7 +16,7 @@ export const SongCard = ({ song, playlists }: Props) => {
 		<li key={song.id} className="group space-y-4 rounded-md p-4 transition-colors hover:bg-slate-800">
 			<div className="relative aspect-square">
 				<BlurredImage
-					src={song.coverUrl}
+					src={song.coverUrl || '/album.jpg'}
 					alt={song.title}
 					className="h-full w-full rounded-md object-cover"
 					width={300}

@@ -36,10 +36,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true; // Ciasteczko tylko dla serwera
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Wymaga HTTPS
-    options.Cookie.SameSite = SameSiteMode.None; // Obs³uga CORS
+    options.Cookie.SameSite = SameSiteMode.None; // Obsï¿½uga CORS
     options.LoginPath = "/login"; // Endpoint logowania
     options.ExpireTimeSpan = TimeSpan.FromHours(1); // Czas trwania ciasteczka
-    options.SlidingExpiration = true; // Odœwie¿anie ciasteczka
+    options.SlidingExpiration = true; // Odï¿½wieï¿½anie ciasteczka
 });
 
 builder.Services.AddAuthorizationBuilder();
@@ -67,7 +67,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

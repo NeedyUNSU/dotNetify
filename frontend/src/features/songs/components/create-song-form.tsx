@@ -11,6 +11,8 @@ import { type Artist } from '@/features/artists/types';
 import { type Genre } from '@/features/genres/types';
 import { useToast } from '@/hooks/use-toast';
 
+import { createSongAction } from '../actions';
+
 interface Props {
 	artists: Artist[];
 	genres: Genre[];
@@ -20,43 +22,40 @@ export const CreateSongForm = ({ artists, genres }: Props) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { toast } = useToast();
 	const [isLoading, setIsLoading] = useState(false);
+	const [artistId, setArtistId] = useState('');
+	const [genreId, setGenreId] = useState('');
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setIsLoading(true);
 
-		// const songData = {
-		// 	title: (e.currentTarget.title as unknown as HTMLInputElement).value,
-		// 	songUrl: (e.currentTarget.songUrl as HTMLInputElement).value,
-		// 	coverUrl: (e.currentTarget.coverUrl as HTMLInputElement).value,
-		// 	releaseYear: Number((e.currentTarget.releaseYear as HTMLInputElement).value),
-		// 	songLength: Number((e.currentTarget.songLength as HTMLInputElement).value),
-		// 	genreId: Number((e.currentTarget.genreId as HTMLInputElement).value),
-		// 	artistId: Number((e.currentTarget.artistId as HTMLInputElement).value),
-		// };
+		const songData = {
+			title: (e.currentTarget.title as unknown as HTMLInputElement).value,
+			songUrl: (e.currentTarget.songUrl as HTMLInputElement).value,
+			coverUrl: (e.currentTarget.coverUrl as HTMLInputElement).value,
+			releaseYear: Number((e.currentTarget.releaseYear as HTMLInputElement).value),
+			songLength: Number((e.currentTarget.songLength as HTMLInputElement).value),
+			genreId: Number(genreId),
+			artistId: Number(artistId),
+		};
 
-		// Create optimistic song and add to UI immediately
-
-		// Comment out backend call for now
-		/*
-		const result = await createSongAction(songData);
-		if (!result.success) {
-			toast({
-				title: 'Error',
-				description: result.error,
-				variant: 'destructive',
-			});
+		if (!songData.genreId || !songData.artistId) {
+			toast({ title: 'Error', description: 'Please select artist and genre', variant: 'destructive' });
 			setIsLoading(false);
 			return;
 		}
-		*/
 
-		toast({
-			title: 'Success',
-			description: 'Song created successfully',
-		});
+		const result = await createSongAction(songData);
+		if (!result.success) {
+			toast({ title: 'Error', description: result.error, variant: 'destructive' });
+			setIsLoading(false);
+			return;
+		}
 
+		toast({ title: 'Success', description: 'Song created successfully' });
 		setIsOpen(false);
+		setArtistId('');
+		setGenreId('');
 		e.currentTarget.reset();
 		setIsLoading(false);
 	};
@@ -75,59 +74,16 @@ export const CreateSongForm = ({ artists, genres }: Props) => {
 					<DialogTitle>Create new song</DialogTitle>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="space-y-4">
-					<FormField
-						label="Title"
-						required
-						type="text"
-						id="title"
-						name="title"
-						placeholder="Enter song title"
-						minLength={1}
-						maxLength={100}
-					/>
-					<FormField
-						label="Song URL"
-						required
-						type="url"
-						id="songUrl"
-						name="songUrl"
-						placeholder="Enter song URL"
-						pattern="https?://.+"
-					/>
-					<FormField
-						label="Cover URL"
-						required
-						type="url"
-						id="coverUrl"
-						name="coverUrl"
-						placeholder="Enter cover image URL"
-						pattern="https?://.+"
-					/>
-					<FormField
-						label="Release Year"
-						required
-						type="number"
-						id="releaseYear"
-						name="releaseYear"
-						min={1900}
-						max={currentYear}
-						defaultValue={currentYear}
-					/>
-					<FormField
-						label="Song Length (seconds)"
-						required
-						type="number"
-						id="songLength"
-						name="songLength"
-						min={1}
-						placeholder="Enter song length in seconds"
-					/>
+					<FormField label="Title" required type="text" id="title" name="title" placeholder="Enter song title" minLength={1} maxLength={100} />
+					<FormField label="Song URL" required type="url" id="songUrl" name="songUrl" placeholder="Enter song URL" pattern="https?://.+" />
+					<FormField label="Cover URL" required type="url" id="coverUrl" name="coverUrl" placeholder="Enter cover image URL" pattern="https?://.+" />
+					<FormField label="Release Year" required type="number" id="releaseYear" name="releaseYear" min={1900} max={currentYear} defaultValue={currentYear} />
+					<FormField label="Song Length (seconds)" required type="number" id="songLength" name="songLength" min={1} placeholder="Enter song length in seconds" />
 					<div className="space-y-2">
 						<label htmlFor="artistId" className="text-sm font-medium">
-							Artist
-							<span className="text-red-500">*</span>
+							Artist<span className="text-red-500">*</span>
 						</label>
-						<Select name="artistId" required>
+						<Select value={artistId} onValueChange={setArtistId}>
 							<SelectTrigger id="artistId">
 								<SelectValue placeholder="Select artist" />
 							</SelectTrigger>
@@ -142,10 +98,9 @@ export const CreateSongForm = ({ artists, genres }: Props) => {
 					</div>
 					<div className="space-y-2">
 						<label htmlFor="genreId" className="text-sm font-medium">
-							Genre
-							<span className="text-red-500">*</span>
+							Genre<span className="text-red-500">*</span>
 						</label>
-						<Select name="genreId" required>
+						<Select value={genreId} onValueChange={setGenreId}>
 							<SelectTrigger id="genreId">
 								<SelectValue placeholder="Select genre" />
 							</SelectTrigger>

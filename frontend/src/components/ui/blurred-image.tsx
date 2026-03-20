@@ -6,6 +6,9 @@ interface Props extends ImageProps {
 	src: string;
 }
 
-export const BlurredImage = async ({ src, ...rest }: Props) => (
-	<NextImage src={src} placeholder="blur" blurDataURL={await getBase64(src)} {...rest} />
-);
+export const BlurredImage = async ({ src, ...rest }: Props) => {
+	if (!src) {
+		return <NextImage src="/album.jpg" {...rest} />;
+	}
+	return <NextImage src={src} placeholder="blur" blurDataURL={await getBase64(src)} {...rest} />;
+};
