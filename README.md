@@ -31,8 +31,13 @@ $env:NODE_TLS_REJECT_UNAUTHORIZED="0"
 pnpm install
 pnpm dev
 ```
+## Run Tests
+```shell
+cd Tests
+dotnet test
+```
 
-## .NETify - Fullstack Spotify Clone By NacomiTagiera fixes by NeedyUNSU
+# .NETify - Fullstack Spotify Clone By NacomiTagiera fixes by NeedyUNSU
 
 A modern, fullstack music streaming application built with .NET 8 and Next.js 15, featuring a comprehensive music library, playlist management, and real-time audio playback.
 
